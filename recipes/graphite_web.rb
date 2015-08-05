@@ -10,6 +10,13 @@ when 'amazon'
     code 'pip install graphite-web --install-option="--install-scripts=/usr/bin" --install-option="--install-lib=/usr/lib/python2.7/site-packages" --install-option="--install-data=/var/lib/graphite"'
     not_if { system('pip show -q graphite-web') }
   end
+
+  user '_graphite' do
+    home '/var/lib/graphite'
+    shell '/sbin/nologin'
+    supports manage_home: false
+  end
+
 else
   package 'graphite-web'
 end

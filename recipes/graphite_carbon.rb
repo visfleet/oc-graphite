@@ -26,6 +26,12 @@ when 'amazon'
     not_if { system('pip show -q carbon') }
   end
 
+  user '_graphite' do
+    home '/var/lib/graphite'
+    shell '/sbin/nologin'
+    supports manage_home: false
+  end
+
   link '/usr/bin/carbon-cache' do
     '/usr/bin/carbon-cache.py'
   end
@@ -40,6 +46,10 @@ when 'amazon'
 
 else
   package 'graphite-carbon'
+end
+
+directory '/var/lib/graphite' do
+  owner '_graphite'
 end
 
 template '/etc/default/graphite-carbon' do
