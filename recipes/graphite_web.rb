@@ -6,6 +6,11 @@
 
 case node[:platform]
 when 'amazon'
+  bash 'install-django' do
+    code 'pip install django --target="/usr/lib/python2.7/site-packages"'
+    not_if { system('pip show -q django') }
+  end
+
   bash 'install-graphite-web' do
     code 'pip install graphite-web --install-option="--install-scripts=/usr/bin" --install-option="--install-lib=/usr/lib/python2.7/site-packages" --install-option="--install-data=/var/lib/graphite"'
     not_if { system('pip show -q graphite-web') }
@@ -33,6 +38,13 @@ when 'amazon'
     group 'root'
   end
 
+  cookbook_file '/usr/lib/python2.7/site-packages/django/contrib/auth/management/commands/scriptchangepassword.py' do
+    source 'scriptchangepassword.py'
+    mode 0644
+    owner 'root'
+    group 'root'
+  end
+
 else
   package 'graphite-web'
 
@@ -46,13 +58,13 @@ else
   directory '/var/lib/graphite' do
     owner '_graphite'
   end
-end
 
-cookbook_file '/usr/lib/python2.7/dist-packages/django/contrib/auth/management/commands/scriptchangepassword.py' do
-  source 'scriptchangepassword.py'
-  mode 0644
-  owner 'root'
-  group 'root'
+  cookbook_file '/usr/lib/python2.7/dist-packages/django/contrib/auth/management/commands/scriptchangepassword.py' do
+    source 'scriptchangepassword.py'
+    mode 0644
+    owner 'root'
+    group 'root'
+  end
 end
 
 execute 'change_admin_pass' do
