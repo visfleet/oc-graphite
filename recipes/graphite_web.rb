@@ -17,15 +17,35 @@ when 'amazon'
     supports manage_home: false
   end
 
+  directory '/var/lib/graphite' do
+    owner '_graphite'
+  end
+
+  directory '/var/lib/graphite/webapp/graphite'
+    owner 'root'
+    recursive true
+  end
+
+  template '/var/lib/graphite/webapp/graphite/local_settings.py' do
+    source 'local_settings.py.erb'
+    mode 0644
+    owner 'root'
+    group 'root'
+  end
+
 else
   package 'graphite-web'
-end
 
-template '/etc/graphite/local_settings.py' do
-  source 'local_settings.py.erb'
-  mode 0644
-  owner 'root'
-  group 'root'
+  template '/etc/graphite/local_settings.py' do
+    source 'local_settings.py.erb'
+    mode 0644
+    owner 'root'
+    group 'root'
+  end
+
+  directory '/var/lib/graphite' do
+    owner '_graphite'
+  end
 end
 
 cookbook_file '/usr/lib/python2.7/dist-packages/django/contrib/auth/management/commands/scriptchangepassword.py' do
@@ -33,10 +53,6 @@ cookbook_file '/usr/lib/python2.7/dist-packages/django/contrib/auth/management/c
   mode 0644
   owner 'root'
   group 'root'
-end
-
-directory '/var/lib/graphite' do
-  owner '_graphite'
 end
 
 execute 'change_admin_pass' do
