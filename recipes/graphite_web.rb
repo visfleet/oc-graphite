@@ -21,7 +21,7 @@ when 'amazon'
     owner '_graphite'
   end
 
-  directory '/var/lib/graphite/webapp/graphite'
+  directory '/var/lib/graphite/webapp/graphite' do
     owner 'root'
     recursive true
   end
