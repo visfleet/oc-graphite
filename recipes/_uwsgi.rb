@@ -13,15 +13,28 @@ service 'uwsgi' do
   supports :restart => true, :start => true, :stop => true, :reload => true
 end
 
-template '/etc/uwsgi/apps-available/graphite.ini' do
-  source 'uwsgi-graphite.erb'
-  owner 'root'
-  group 'root'
-  mode 0644
+case node[:platform]
+when 'amazon'
+  template '/etc/uwsgi.d/graphite.ini' do
+    source 'uwsgi-graphite.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
 
-  notifies :reload, 'service[uwsgi]', :delayed
-end
+    notifies :reload, 'service[uwsgi]', :delayed
+  end
 
-link '/etc/uwsgi/apps-enabled/graphite.ini' do
-  to '/etc/uwsgi/apps-available/graphite.ini'
+when 'ubuntu'
+  template '/etc/uwsgi/apps-available/graphite.ini' do
+    source 'uwsgi-graphite.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
+
+    notifies :reload, 'service[uwsgi]', :delayed
+  end
+
+  link '/etc/uwsgi/apps-enabled/graphite.ini' do
+    to '/etc/uwsgi/apps-available/graphite.ini'
+  end
 end
