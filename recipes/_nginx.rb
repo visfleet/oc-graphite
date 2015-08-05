@@ -10,24 +10,48 @@ node.default['oc-graphite']['uwsgi']['listen_ip'] = '127.0.0.1'
 node.default['oc-graphite']['uwsgi']['listen_port'] = '8081'
 include_recipe 'oc-graphite::_uwsgi'
 
-template '/etc/nginx/sites-available/graphite' do
-  source 'nginx-graphite.erb'
-  owner 'root'
-  group 'root'
-  mode 0644
+case node[:platform]
+when 'amazon'
 
-  notifies :reload, 'service[nginx]', :delayed
-end
+  template '/etc/nginx/nginx.conf' do
+    source 'nginx.conf.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
 
-link '/etc/nginx/sites-enabled/graphite' do
-  to '/etc/nginx/sites-available/graphite'
-end
+    notifies :reload, 'service[nginx]', :delayed
+  end
 
-file '/etc/nginx/sites-enabled/default' do
-  action :delete
 
-  notifies :reload, 'service[nginx]', :delayed
-  only_if { node['oc-graphite']['nginx']['disable_default_vhost'] }
+  template '/etc/nginx/conf.d/graphite.conf' do
+    source 'nginx-graphite.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
+
+    notifies :reload, 'service[nginx]', :delayed
+  end
+
+when 'ubuntu'
+  template '/etc/nginx/sites-available/graphite' do
+    source 'nginx-graphite.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
+
+    notifies :reload, 'service[nginx]', :delayed
+  end
+
+  link '/etc/nginx/sites-enabled/graphite' do
+    to '/etc/nginx/sites-available/graphite'
+  end
+
+  file '/etc/nginx/sites-enabled/default' do
+    action :delete
+
+    notifies :reload, 'service[nginx]', :delayed
+    only_if { node['oc-graphite']['nginx']['disable_default_vhost'] }
+  end
 end
 
 service 'nginx' do
