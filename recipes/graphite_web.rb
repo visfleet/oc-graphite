@@ -4,7 +4,13 @@
 #
 # Copyright (C) 2014, Chef Software, Inc <legal@getchef.com>
 
-package 'graphite-web'
+case node[:platform]
+when 'amazon'
+  package 'graphite-web'
+  package 'graphite-web-selinux'
+else
+  package 'graphite-web'
+end
 
 template '/etc/graphite/local_settings.py' do
   source 'local_settings.py.erb'

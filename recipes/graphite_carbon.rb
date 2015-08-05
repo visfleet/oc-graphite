@@ -4,7 +4,12 @@
 #
 # Copyright (C) 2014, Chef Software, Inc <legal@getchef.com>
 
-package 'graphite-carbon'
+case node[:platform]
+when 'amazon'
+  package 'python-carbon'
+else
+  package 'graphite-carbon'
+end
 
 template '/etc/default/graphite-carbon' do
   source 'graphite-carbon.erb'
