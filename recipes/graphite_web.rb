@@ -4,11 +4,18 @@
 #
 # Copyright (C) 2014, Chef Software, Inc <legal@getchef.com>
 
+graphite_manage = ''
+
 case node[:platform]
 when 'amazon'
   bash 'install-django' do
     code 'pip install django --target="/usr/lib/python2.7/site-packages"'
     not_if { system('pip show -q django') }
+  end
+
+  bash 'install-django-tagging' do
+    code 'pip install django-tagging --target="/usr/lib/python2.7/site-packages"'
+    not_if { system('pip show -q django-tagging') }
   end
 
   bash 'install-graphite-web' do
@@ -22,16 +29,7 @@ when 'amazon'
     supports manage_home: false
   end
 
-  directory '/var/lib/graphite' do
-    owner '_graphite'
-  end
-
-  directory '/var/lib/graphite/webapp/graphite' do
-    owner 'root'
-    recursive true
-  end
-
-  template '/var/lib/graphite/webapp/graphite/local_settings.py' do
+  template '/usr/lib/python2.7/site-packages/graphite/local_settings.py' do
     source 'local_settings.py.erb'
     mode 0644
     owner 'root'
@@ -45,6 +43,8 @@ when 'amazon'
     group 'root'
   end
 
+  graphite_manage = '/usr/lib/python2.7/site-packages/django/bin/django-admin.py'
+
 else
   package 'graphite-web'
 
@@ -55,20 +55,22 @@ else
     group 'root'
   end
 
-  directory '/var/lib/graphite' do
-    owner '_graphite'
-  end
-
   cookbook_file '/usr/lib/python2.7/dist-packages/django/contrib/auth/management/commands/scriptchangepassword.py' do
     source 'scriptchangepassword.py'
     mode 0644
     owner 'root'
     group 'root'
   end
+
+  graphite_manage = 'graphite-manage'
+end
+
+directory '/var/lib/graphite' do
+  owner '_graphite'
 end
 
 execute 'change_admin_pass' do
-  command "graphite-manage scriptchangepassword admin #{node['oc-graphite']['web']['seed_password']}"
+  command "#{graphite_manage} scriptchangepassword admin #{node['oc-graphite']['web']['seed_password']} --settings=graphite.settings"
   user '_graphite'
   cwd '/var/lib/graphite'
   action :nothing
@@ -78,8 +80,8 @@ bash 'set_up_db' do
   user '_graphite'
   code <<-EOH
   echo 'start'
-  graphite-manage syncdb --noinput
-  graphite-manage createsuperuser --noinput --username=admin --email=paul@getchef.com
+  #{graphite_manage} syncdb --noinput --settings=graphite.settings
+  #{graphite_manage} createsuperuser --noinput --username=admin --email=paul@getchef.com --settings=graphite.settings
   EOH
 
   not_if { ::File.exist? '/var/lib/graphite/graphite.db' }
