@@ -33,7 +33,7 @@ when 'amazon'
   end
 
   link '/usr/bin/carbon-cache' do
-    '/usr/bin/carbon-cache.py'
+    to '/usr/bin/carbon-cache.py'
   end
 
   template '/etc/init.d/carbon-cache' do
@@ -41,7 +41,7 @@ when 'amazon'
     mode 0755
     owner 'root'
     group 'root'
-    notifies :restart, 'service[carbon-cache]'
+    notifies :restart, 'service[carbon-cache]', :delayed
   end
 
 else
