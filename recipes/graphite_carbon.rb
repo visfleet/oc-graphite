@@ -37,7 +37,7 @@ when 'amazon'
   end
 
   template '/etc/init.d/carbon-cache' do
-    source 'init.d/carbon.erb'
+    source 'init.d/carbon-cache.erb'
     mode 0755
     owner 'root'
     group 'root'
