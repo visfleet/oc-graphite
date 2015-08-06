@@ -9,5 +9,5 @@ plugins-dir = /usr/lib/uwsgi/plugins
 plugins = python
 uid = _graphite
 gid = _graphite
-wsgi-file = /usr/share/graphite-web/graphite.wsgi
+wsgi-file = <%= @graphite_web_path %>/graphite.wsgi
 http-socket = <%= node['oc-graphite']['uwsgi']['listen_ip'] %>:<%= node['oc-graphite']['uwsgi']['listen_port'] %>
