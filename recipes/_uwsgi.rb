@@ -15,6 +15,12 @@ end
 
 case node[:platform]
 when 'amazon'
+  directory '/run/uwsgi' do
+    owner 'uwsgi'
+    group 'uwsgi'
+    mode '0755'
+  end
+
   graphite_web_path = '/var/lib/graphite'
 
   bash 'copy-uwsgi-carbon-conf' do
@@ -24,8 +30,8 @@ when 'amazon'
 
   template '/etc/uwsgi.d/graphite.ini' do
     source 'uwsgi-graphite.erb'
-    owner 'root'
-    group 'root'
+    owner 'uwsgi'
+    group 'uwsgi'
     mode 0644
     variables({ :graphite_web_path => graphite_web_path })
 
