@@ -44,6 +44,8 @@ when 'amazon'
     notifies :restart, 'service[carbon-cache]', :delayed
   end
 
+  directory '/etc/carbon'
+
 else
   package 'graphite-carbon'
 end
