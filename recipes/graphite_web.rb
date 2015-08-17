@@ -8,14 +8,13 @@ graphite_manage = ''
 
 case node[:platform]
 when 'amazon'
-  bash 'install-django' do
-    code 'pip install django --target="/usr/lib/python2.7/site-packages"'
-    not_if { system('pip show -q django') }
-  end
+  package 'python27-pycairo-devel'
 
-  bash 'install-django-tagging' do
-    code 'pip install django-tagging --target="/usr/lib/python2.7/site-packages"'
-    not_if { system('pip show -q django-tagging') }
+  %{ django django-tagging cairo cffi cairocffi }.each do |pkg|
+    bash "install-#{pkg}" do
+      code "pip install #{pkg} --target='/usr/lib/python2.7/site-packages'"
+      not_if { system("pip show -q #{pkg}") }
+    end
   end
 
   bash 'install-graphite-web' do

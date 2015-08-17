@@ -1,0 +1,7 @@
+[uwsgi]
+uid = _graphite
+gid = _graphite
+pidfile = /run/uwsgi/uwsgi.pid
+emperor = /etc/uwsgi.d
+stats = /run/uwsgi/stats.sock
+cap = setgid,setuid

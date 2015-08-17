@@ -26,13 +26,12 @@ when 'amazon'
     owner 'root'
     group 'root'
     mode 0755
-
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
   directory '/run/uwsgi' do
-    owner 'uwsgi'
-    group 'uwsgi'
+    owner '_graphite'
+    group '_graphite'
     mode 0755
     notifies :restart, 'service[uwsgi]', :delayed
   end
@@ -45,13 +44,20 @@ when 'amazon'
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
+  template '/etc/uwsgi.ini' do
+    source 'uwsgi.ini.erb'
+    owner 'uwsgi'
+    group 'uwsgi'
+    mode 0644
+    notifies :restart, 'service[uwsgi]', :delayed
+  end
+
   template '/etc/uwsgi.d/graphite.ini' do
-    source 'uwsgi-graphite.erb'
+    source 'uwsgi-graphite.ini.erb'
     owner 'uwsgi'
     group 'uwsgi'
     mode 0644
     variables({ :graphite_web_path => graphite_web_path })
-
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
@@ -64,7 +70,6 @@ when 'ubuntu'
     group 'root'
     mode 0644
     variables({ :graphite_web_path => graphite_web_path })
-
     notifies :reload, 'service[uwsgi]', :delayed
   end
 
