@@ -36,8 +36,6 @@ when 'amazon'
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
-  graphite_web_path = '/var/lib/graphite/conf'
-
   bash 'copy-uwsgi-carbon-conf' do
     code "cp #{graphite_web_path}/graphite.wsgi.example #{graphite_web_path}/graphite.wsgi"
     not_if { ::File.exist?("#{graphite_web_path}/graphite.wsgi") }
@@ -52,24 +50,28 @@ when 'amazon'
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
+  graphite_web_path = '/var/lib/graphite/conf'
+  uwsgi_plugin_path = '/usr/lib64/uwsgi'
+
   template '/etc/uwsgi.d/graphite.ini' do
     source 'uwsgi-graphite.ini.erb'
     owner 'uwsgi'
     group 'uwsgi'
     mode 0644
-    variables({ :graphite_web_path => graphite_web_path })
+    variables({ :graphite_web_path => graphite_web_path, :uwsgi_plugin_path => uwsgi_plugin_path })
     notifies :restart, 'service[uwsgi]', :delayed
   end
 
 when 'ubuntu'
   graphite_web_path = '/usr/share/graphite-web'
+  uwsgi_plugin_path = '/usr/lib/uwsgi/plugins'
 
   template '/etc/uwsgi/apps-available/graphite.ini' do
     source 'uwsgi-graphite.erb'
     owner 'root'
     group 'root'
     mode 0644
-    variables({ :graphite_web_path => graphite_web_path })
+    variables({ :graphite_web_path => graphite_web_path, :uwsgi_plugin_path => uwsgi_plugin_path })
     notifies :reload, 'service[uwsgi]', :delayed
   end
 

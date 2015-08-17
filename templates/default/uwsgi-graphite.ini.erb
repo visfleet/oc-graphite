@@ -5,7 +5,7 @@
 ##################################
 
 [uwsgi]
-plugins-dir = /usr/lib/uwsgi/plugins
+plugins-dir = <%= @uwsgi_plugin_path %>
 plugins = python
 uid = _graphite
 gid = _graphite
