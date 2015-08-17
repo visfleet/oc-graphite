@@ -10,7 +10,7 @@ case node[:platform]
 when 'amazon'
   package 'python27-pycairo-devel'
 
-  %w{ django django-tagging cairo cffi cairocffi }.each do |pkg|
+  %w{ django django-tagging cffi cairocffi }.each do |pkg|
     bash "install-#{pkg}" do
       code "pip install #{pkg} --target='/usr/lib/python2.7/site-packages'"
       not_if { system("pip show -q #{pkg}") }
