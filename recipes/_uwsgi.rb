@@ -15,8 +15,16 @@ end
 
 case node[:platform]
 when 'amazon'
+  packages = %w{ python27-devel python27-setuptools autoconf automake bison byacc crash cscope ctags diffstat doxygen elfutils flex gcc gcc-c++ gcc-gfortran gdb gettext git indent intltool kexec-tools latrace libtool ltrace patch patchutils rpm-build strace swig system-rpm-config systemtap systemtap-runtime texinfo perl-ExtUtils-Embed }
+
+  packages.each do |pkg|
+    package pkg do
+      action :nothing
+    end.run_action(:install)
+  end
+
   bash 'install-uwsgi' do
-    code 'pip install uwsgi -U --target="/usr/lib/python2.7/site-packages"'
+    code 'pip install uwsgi -U --target="/usr/lib/python2.7/dist-packages"'
     not_if { system('pip show -q uwsgi') }
     notifies :restart, 'service[uwsgi]', :delayed
   end
